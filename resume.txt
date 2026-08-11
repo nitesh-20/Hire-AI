@@ -1,0 +1,43 @@
+NITESH SAHU
+AI Systems & Full-Stack Engineer
+Bengaluru, Karnataka — +91 9755175246 — iamniteshsahu20@gmail.com
+
+Summary:
+AI Systems & Full-Stack Engineer specializing in production LLM infrastructure, real-time Voice AI, and autonomous multi-agent workflows. Hands-on experience in architecting full-stack software and fail-safe AI pipelines across fintech, legaltech, and regtech. Recognized across 5+ national hackathons for building production-grade software solutions.
+
+Education:
+Chhattisgarh Swami Vivekanand Technical University, Bhilai, Chhattisgarh
+Bachelor of Technology in Computer Science (2023–2027)
+
+Technical Skills:
+- Languages: Python, TypeScript, JavaScript, C++, SQL
+- AI & LLM Systems: Multi-Agent Systems, RAG Pipelines, Real-Time Voice AI, Vector DBs
+- Frameworks & Tools: LangGraph, FastAPI, React 19, Node.js, Qdrant, Gemini Live API, ElevenLabs
+- Databases & Storage: PostgreSQL, MySQL, Firebase Firestore
+- Cloud & Web Security: Docker, Google Cloud Platform, Git/GitHub, REST APIs, WebSockets
+
+Experience:
+GDG Lead – GDG on Campus SSIPMT Raipur (Jul 2025–Present)
+- Led community of 500+ developers; organized technical workshops on Agentic AI, Cloud, and Full-Stack development.
+- Led hands-on workshops on Gemini API, Firebase, React, and Google Cloud.
+
+Full Stack Web Development Intern – ElevanceSkills (Jan 2026–Jun 2026)
+- Developed scalable RESTful APIs using Node.js/Express with database query optimization under high concurrent requests.
+- Implemented JWT authentication, role-based access control (RBAC), and IP rate limiting middleware.
+- Automated API integration testing pipelines using Postman and GitHub Actions.
+
+Web Developer Intern – Internship Studio (May 2024–Jul 2024)
+- Developed reusable React.js components and responsive layouts using Tailwind CSS.
+
+Projects:
+- LawGPT – AI Legal Assistant: Built legal research assistant using semantic chunking & vector search in Qdrant; MCP-inspired multi-agent architecture with FastAPI, Firebase, Gemini.
+- Vaani AI – Real-Time Voice AI Agent: Architected low-latency voice streaming pipeline using LiveKit WebSockets, Gemini Live API, ElevenLabs TTS; built transaction verification voice workflows.
+- Finance Copilot – AI-Powered Equity Research Platform: Multi-agent financial platform with Orchestrator coordinating Bull/Bear/Judge agents to automate stock thesis analysis.
+- RIO – Regulatory Intelligence Operating System: Autonomous multi-agent regulatory monitor using LangGraph, PostgreSQL, and Redis caching for asynchronous impact analysis.
+
+Achievements:
+- Winner – Google Build & Blog Marathon 2025
+- Finalist – Google Cloud Agentic AI Day 2025
+- Finalist – Paytm Hackathon 2026
+- Finalist – East India Blockchain Hackathon, IIT Kharagpur
+- 4th Rank – ESG Invest Hackathon, IIT Bombay

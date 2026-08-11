@@ -15,6 +15,7 @@ import yaml
 
 from . import digest as digest_mod
 from . import llm, mailer
+from . import prefilter as prefilter_mod
 from .fetch import fetch_all
 from .mock import fetch_all_mock
 from .prefilter import prefilter

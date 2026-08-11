@@ -62,6 +62,16 @@ companies:
 - {ats: greenhouse, slug: striiminc, name: Striim}
 - {ats: greenhouse, slug: mesh, name: Mesh}
 - {ats: greenhouse, slug: ethos, name: Ethos Life}
+- {ats: greenhouse, slug: postman, name: Postman}
+- {ats: greenhouse, slug: slice, name: slice}
+- {ats: greenhouse, slug: elastic, name: Elastic}
+- {ats: greenhouse, slug: databricks, name: Databricks}
+- {ats: greenhouse, slug: mongodb, name: MongoDB}
+- {ats: greenhouse, slug: airtable, name: Airtable}
+- {ats: greenhouse, slug: amplitude, name: Amplitude}
+- {ats: greenhouse, slug: datadog, name: Datadog}
+- {ats: greenhouse, slug: cockroachlabs, name: Cockroach Labs}
+- {ats: greenhouse, slug: rubrik, name: Rubrik}
 
 - {ats: ashby, slug: plotlineso, name: Plotline}
 - {ats: ashby, slug: reo-dev, name: Reo.Dev}
@@ -82,6 +92,16 @@ companies:
 - {ats: ashby, slug: oneapp, name: OnePay}
 - {ats: ashby, slug: josys, name: JOSYS}
 - {ats: ashby, slug: almabase, name: Almabase}
+- {ats: ashby, slug: langchain, name: LangChain}
+- {ats: ashby, slug: dust, name: Dust}
+- {ats: ashby, slug: deepgram, name: Deepgram}
+- {ats: ashby, slug: elevenlabs, name: ElevenLabs}
+- {ats: ashby, slug: cursor, name: Cursor}
+- {ats: ashby, slug: fireworks, name: Fireworks AI}
+- {ats: ashby, slug: superhuman, name: Superhuman}
+- {ats: ashby, slug: vanta, name: Vanta}
+- {ats: ashby, slug: linear, name: Linear}
+- {ats: ashby, slug: raycast, name: Raycast}
 
 - {ats: lever, slug: stable-money1, name: Stable Money}
 - {ats: lever, slug: acceldata, name: Acceldata}
@@ -90,3 +110,4 @@ companies:
 - {ats: lever, slug: getwingapp, name: Wing Assistant}
 - {ats: lever, slug: zaimler, name: zaimler}
 - {ats: lever, slug: Onehouse, name: Onehouse}
+- {ats: lever, slug: zeta, name: Zeta}

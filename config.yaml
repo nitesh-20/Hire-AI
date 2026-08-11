@@ -15,6 +15,35 @@ target_experience:
   new_grad: true
   entry_level: true
 
+target_locations:
+  primary:
+    - bangalore
+    - bengaluru
+    - hyderabad
+  secondary:
+    - raipur
+  other_india:
+    - mumbai
+    - pune
+    - gurgaon
+    - gurugram
+    - noida
+    - delhi
+    - chennai
+    - india
+  allow_remote: true
+
+sources:
+  wellfound:
+    enabled: false  # Marketplace connector interface. Enable when public endpoint/feed is supplied.
+    endpoint: ""
+    locations:
+      - bangalore
+      - hyderabad
+      - raipur
+      - india
+      - remote
+
 filters:
 
   # --------------------------------------------------------------------------

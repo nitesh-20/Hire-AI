@@ -95,7 +95,7 @@ def cmd_run(args) -> int:
     filters = cfg.get("filters", {}) or {}
 
     # ---- 1. fetch
-    print("\n[1/5] fetching boards")
+    print("\n[1/6] fetching sources")
     if args.mock:
         jobs = fetch_all_mock()
     else:
@@ -104,17 +104,25 @@ def cmd_run(args) -> int:
             print("companies.yaml has no entries")
             return 1
         jobs = fetch_all(companies)
+        wf_cfg = (cfg.get("sources") or {}).get("wellfound") or {}
+        if wf_cfg.get("enabled"):
+            print("  [wellfound] connector interface enabled (requires endpoint URL)")
     scanned = len(jobs)
     if not scanned:
         print("no postings fetched — check the slugs in companies.yaml")
         return 1
 
-    # ---- 2. prefilter + dedupe (deterministic, free, no LLM)
-    print("\n[2/5] filtering")
-    jobs = prefilter(jobs, filters)
+    # ---- 2. normalize & deduplicate
+    print("\n[2/6] normalizing & deduplicating")
+    jobs, dups_dropped = prefilter_mod.deduplicate(jobs)
+    print(f"  scanned: {scanned} | duplicates dropped: {dups_dropped} | unique: {len(jobs)}")
+
+    # ---- 3. prefilter
+    print("\n[3/6] filtering")
+    jobs = prefilter_mod.prefilter(jobs, cfg)
     passed_filters = len(jobs)
     jobs = store.unseen(jobs)
-    print(f"  new since last run: {len(jobs)}")
+    print(f"  unseen new since last run: {len(jobs)}")
     candidates = len(jobs)
     if args.limit:
         jobs = jobs[:args.limit]
@@ -130,10 +138,10 @@ def cmd_run(args) -> int:
     if target_exp and "target_experience" not in profile:
         profile = dict(profile, target_experience=target_exp)
 
-    # ---- 3. screen
+    # ---- 4. screen
     scorer = "keyword" if args.scorer == "keyword" else "llm"
     if scorer == "keyword":
-        print(f"\n[3/5] screening {len(jobs)} jobs (keyword stub — DEV ONLY)")
+        print(f"\n[4/6] screening {len(jobs)} jobs (keyword stub — DEV ONLY)")
         llm.keyword_screen(jobs, profile)
     else:
         try:
@@ -141,7 +149,7 @@ def cmd_run(args) -> int:
         except LLMError as e:
             print(f"\n{e}\nNo key? Run with --scorer keyword for an offline dry run.")
             return 1
-        print(f"\n[3/5] screening {len(jobs)} jobs via {provider.name}/{model}")
+        print(f"\n[4/6] screening {len(jobs)} jobs via {provider.name}/{model}")
         llm.screen(jobs, profile,
                    batch_size=int(cfg.get("screen_batch_size", 8)),
                    jd_chars=int(cfg.get("screen_jd_chars", 1400)),
@@ -163,8 +171,8 @@ def cmd_run(args) -> int:
     below_thresh = sum(1 for j in jobs if (j.score or 0) < threshold) - exp_rejected
     print(f"  screened: {len(jobs)} | experience/seniority rejected: {exp_rejected} | below threshold: {below_thresh} | passed threshold ({threshold}): {len(shortlist)}")
 
-    # ---- 4. draft
-    print(f"\n[4/5] drafting kits for {len(shortlist)}")
+    # ---- 5. draft
+    print(f"\n[5/6] drafting kits for {len(shortlist)}")
     if not shortlist:
         print("  nothing cleared the threshold")
     elif scorer == "keyword" or args.no_draft:
@@ -179,8 +187,8 @@ def cmd_run(args) -> int:
         except LLMError as e:
             print(f"  ! drafting unavailable: {e}")
 
-    # ---- 5. digest
-    print("\n[5/5] digest")
+    # ---- 6. digest
+    print("\n[6/6] digest")
     subject, doc = digest_mod.build(shortlist, scanned, candidates, store.stats())
     path = digest_mod.write(doc, cfg.get("digest_file", "out/digest.html"))
     print(f"  wrote {path}")

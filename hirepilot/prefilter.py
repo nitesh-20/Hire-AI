@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, timezone
 
 from .fetch import Job
 
-REMOTE_HINTS = ("remote", "anywhere", "work from home", "wfh", "distributed")
+REMOTE_HINTS = ("remote", "anywhere", "work from home", "wfh", "distributed", "india")
 
 
 def _any_match(patterns: list[str], text: str) -> bool:
@@ -30,12 +30,48 @@ def _parse_date(value: str | None) -> datetime | None:
     return None
 
 
+def deduplicate(jobs: list[Job]) -> tuple[list[Job], int]:
+    """Deduplicate jobs across multiple sources by canonical URL, ID, or title+company key."""
+    seen_urls, seen_ids, seen_keys = set(), set(), set()
+    out = []
+    dropped = 0
+
+    for j in jobs:
+        url_key = j.url.strip().lower() if j.url else None
+        id_key = j.job_id
+        comp_key = f"{j.company.strip().lower()}:{j.title.strip().lower()}:{j.location.strip().lower()}"
+
+        if (url_key and url_key in seen_urls) or (id_key in seen_ids) or (comp_key in seen_keys):
+            dropped += 1
+            continue
+
+        if url_key:
+            seen_urls.add(url_key)
+        seen_ids.add(id_key)
+        seen_keys.add(comp_key)
+        out.append(j)
+
+    return out, dropped
+
+
 def prefilter(jobs: list[Job], cfg: dict) -> list[Job]:
-    inc = cfg.get("include_titles") or [r"."]
-    exc = cfg.get("exclude_titles") or []
-    locs = [l.lower() for l in (cfg.get("locations") or [])]
-    allow_remote = bool(cfg.get("allow_remote", True))
-    max_age = cfg.get("max_age_days")
+    filters = cfg.get("filters", cfg) or {}
+    inc = filters.get("include_titles") or [r"."]
+    exc = filters.get("exclude_titles") or []
+
+    # Gather target locations from filters.locations or top-level target_locations
+    locs = [l.lower() for l in (filters.get("locations") or [])]
+    target_loc_cfg = cfg.get("target_locations") or {}
+    if isinstance(target_loc_cfg, dict):
+        for k in ("primary", "secondary", "other_india"):
+            for l in target_loc_cfg.get(k) or []:
+                if l.lower() not in locs:
+                    locs.append(l.lower())
+        allow_remote = bool(target_loc_cfg.get("allow_remote", filters.get("allow_remote", True)))
+    else:
+        allow_remote = bool(filters.get("allow_remote", True))
+
+    max_age = filters.get("max_age_days", cfg.get("max_age_days"))
     cutoff = datetime.now(timezone.utc) - timedelta(days=max_age) if max_age else None
 
     kept, stats = [], {"title": 0, "location": 0, "age": 0}

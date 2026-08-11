@@ -37,26 +37,35 @@ HirePilot AI addresses these issues directly:
 
 ## Core Features
 
-### 1. ATS Job Discovery
-HirePilot AI fetches open postings directly from official, unauthenticated public ATS endpoints—eliminating the need for fragile web scrapers or accounts:
-* **Greenhouse API**: Fetches active job listings via `boards-api.greenhouse.io`.
-* **Lever API**: Fetches postings via `api.lever.co`.
-* **Ashby API**: Fetches job board data via `api.ashbyhq.com`.
+### 1. Multi-Source Discovery Architecture
+HirePilot AI features an extensible source adapter architecture ([`hirepilot/fetch.py`](hirepilot/fetch.py)) supporting two source categories (`ats` and `marketplace`):
+* **Greenhouse API** (`ats`): Fetches active job listings via `boards-api.greenhouse.io`.
+* **Lever API** (`ats`): Fetches postings via `api.lever.co`.
+* **Ashby API** (`ats`): Fetches job board data via `api.ashbyhq.com`.
+* **Wellfound Connector** (`marketplace`): Includes normalized `parse_wellfound` connector interface (`source_type: marketplace`). *Note: Wellfound discovery requires a configured public feed/endpoint URL (`sources.wellfound.enabled: true`). Automatic ingestion does not bypass authentication or defeat CAPTCHAs.*
 
-Target companies and their respective ATS slugs are configurable in [`companies.yaml`](companies.yaml).
+Target companies and ATS slugs are configured in [`companies.yaml`](companies.yaml); multi-source marketplace options are configured in [`config.yaml`](config.yaml).
 
-### 2. Deterministic Pre-Filtering
-Before executing AI evaluations, job listings pass through a fast, cost-free filtering stage configured in [`config.yaml`](config.yaml):
-* **Title Regex Inclusion & Exclusion**: Matches job titles against regex patterns (e.g., matching backend, full-stack, AI, systems roles while excluding senior management, internships, or irrelevant disciplines).
-* **Location Gate**: Filters by target cities or regions (e.g., Bengaluru, Hyderabad, India).
-* **Remote Role Support**: Passes postings marked as remote even if the primary location differs.
-* **Freshness Threshold (`max_age_days`)**: Excludes stale job listings older than a specified number of days.
+### 2. Location & Remote Target Expansion
+* **Primary Tech Hubs**: Bangalore / Bengaluru, Hyderabad
+* **Secondary Hubs**: Raipur
+* **Other Tech Hubs**: Mumbai, Pune, Gurgaon, Gurugram, Noida, Delhi, Chennai, India
+* **Remote India**: Full support for `Remote`, `Remote - India`, `Work from home`, `WFH`, `Anywhere in India` (`allow_remote: true`).
 
-### 3. AI Candidate Screening & Fit Scoring
-Jobs passing pre-filters are evaluated by an LLM against the candidate's [`profile.json`](profile.json):
-* **Batch Processing**: Groups job descriptions into batches (`screen_batch_size`) for optimal throughput and reduced latency.
-* **Context Truncation**: Truncates raw HTML job descriptions to essential text (`screen_jd_chars`) to control token consumption.
-* **Fit Scoring (0.0–10.0)**: Scores candidates on genuine match quality and filters out listings below `score_threshold` (default `7.0`).
+### 3. Early-Career & Internship Focus
+* **Allowed Scope**: Internships, 0 YOE, 0–1 YOE, 1 YOE, 1–2 YOE, up to 2 YOE, Associate SE, SDE I, Junior Engineer, Early Career, New Grad.
+* **Preferred vs Required**: Roles stating "2-3 years preferred" remain eligible. Roles explicitly requiring 3+ / 4+ / 5+ years are **hard rejected**.
+
+### 4. Deterministic Pre-Filtering & Deduplication
+Before executing AI evaluations, job listings pass through a fast, cost-free filtering stage:
+* **Multi-Source Deduplication**: Eliminates duplicate job postings by canonical URL, source ID, or company-title-location keys across multiple sources.
+* **Title Regex Inclusion & Exclusion**: Matches job titles against regex patterns (e.g. software, backend, full-stack, AI, GenAI, LLM, agentic AI, ML, platform, cloud, product engineering, and internships).
+* **Freshness Gate (`max_age_days: 14`)**: Drops stale job listings posted/updated more than 14 days ago.
+
+### 5. AI Candidate Screening & Fit Scoring
+Jobs passing pre-filters are evaluated by an LLM against candidate profile & early-career hard constraints:
+* **Batch Processing**: Groups job descriptions into batches (`screen_batch_size`) for optimal throughput.
+* **Fit Scoring (0.0–10.0)**: Scores candidates on genuine match quality and filters out listings below `score_threshold`. Hard constraint penalizes >2 YOE requirements.
 
 ### 4. Application Kit Drafting
 For jobs clearing the match score threshold, a high-tier LLM stage generates a custom application kit:

@@ -40,6 +40,7 @@ class Job:
     description: str
     posted_at: str | None = None
     salary: str | None = None
+    source_type: str = "ats"  # "ats" | "marketplace"
     # filled in later by the pipeline
     score: float | None = None
     reason: str | None = None
@@ -67,6 +68,7 @@ def parse_greenhouse(slug: str, company: str, body: Any) -> list[Job]:
             url=j.get("absolute_url") or "",
             description=strip_html(j.get("content")),
             posted_at=j.get("updated_at") or j.get("first_published"),
+            source_type="ats",
         ))
     return out
 
@@ -95,6 +97,7 @@ def parse_lever(slug: str, company: str, body: Any) -> list[Job]:
             description="\n\n".join(c for c in chunks if c).strip(),
             posted_at=posted,
             salary=cats.get("commitment"),
+            source_type="ats",
         ))
     return out
 
@@ -119,6 +122,33 @@ def parse_ashby(slug: str, company: str, body: Any) -> list[Job]:
             description=(j.get("descriptionPlain") or strip_html(j.get("descriptionHtml")) or "").strip(),
             posted_at=j.get("publishedAt"),
             salary=salary,
+            source_type="ats",
+        ))
+    return out
+
+
+def parse_wellfound(slug: str, company: str, body: Any) -> list[Job]:
+    """Parse Wellfound marketplace postings from a JSON endpoint/feed payload."""
+    out = []
+    items = body if isinstance(body, list) else (body or {}).get("jobs") or (body or {}).get("postings") or []
+    for item in items:
+        jid = item.get("id") or item.get("job_id") or "1"
+        comp = item.get("company_name") or item.get("company") or company
+        title = item.get("title") or item.get("role") or ""
+        loc = item.get("location") or item.get("location_name") or ""
+        url = item.get("url") or item.get("job_url") or f"https://wellfound.com/jobs/{jid}"
+        desc = strip_html(item.get("description") or item.get("content"))
+        posted = item.get("posted_at") or item.get("published_at")
+        out.append(Job(
+            job_id=f"wellfound:{slug}:{jid}",
+            ats="wellfound",
+            company=comp,
+            title=str(title).strip(),
+            location=str(loc).strip(),
+            url=url,
+            description=desc,
+            posted_at=posted,
+            source_type="marketplace",
         ))
     return out
 
@@ -127,6 +157,7 @@ ENDPOINTS = {
     "greenhouse": ("https://boards-api.greenhouse.io/v1/boards/{slug}/jobs?content=true", parse_greenhouse),
     "lever":      ("https://api.lever.co/v0/postings/{slug}?mode=json", parse_lever),
     "ashby":      ("https://api.ashbyhq.com/posting-api/job-board/{slug}?includeCompensation=true", parse_ashby),
+    "wellfound":  ("{endpoint}", parse_wellfound),
 }
 
 

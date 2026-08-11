@@ -186,3 +186,50 @@ def test_allow_remote_is_what_lets_an_out_of_region_remote_role_through():
 def test_empty_filters_keep_everything():
     jobs = fetch_all_mock()
     assert len(prefilter(jobs, {})) == len(jobs)
+
+
+def test_target_locations_matching():
+    """Verify Bangalore, Hyderabad, Raipur, and Remote India matching."""
+    from hirepilot.fetch import Job
+    j_bgr = Job(job_id="g:1", ats="greenhouse", company="A", title="Software Engineer", location="Bengaluru, Karnataka", url="u1", description="d")
+    j_hyd = Job(job_id="g:2", ats="greenhouse", company="B", title="Software Engineer", location="Hyderabad, Telangana", url="u2", description="d")
+    j_rpr = Job(job_id="g:3", ats="greenhouse", company="C", title="Software Engineer", location="Raipur, Chhattisgarh", url="u3", description="d")
+    j_rem = Job(job_id="g:4", ats="greenhouse", company="D", title="Software Engineer", location="Work from home, India", url="u4", description="d")
+    j_bad = Job(job_id="g:5", ats="greenhouse", company="E", title="Software Engineer", location="London, UK", url="u5", description="d")
+
+    cfg = {"target_locations": {"primary": ["bangalore", "bengaluru", "hyderabad"], "secondary": ["raipur"], "allow_remote": True}}
+    kept = prefilter([j_bgr, j_hyd, j_rpr, j_rem, j_bad], cfg)
+
+    kept_ids = {j.job_id for j in kept}
+    assert "g:1" in kept_ids
+    assert "g:2" in kept_ids
+    assert "g:3" in kept_ids
+    assert "g:4" in kept_ids
+    assert "g:5" not in kept_ids
+
+
+def test_deduplication():
+    """Verify multi-source deduplication by URL and company+title+location key."""
+    from hirepilot.fetch import Job
+    from hirepilot.prefilter import deduplicate
+
+    j1 = Job(job_id="g:1", ats="greenhouse", company="Acme", title="Software Engineer", location="Bangalore", url="https://example.com/job1", description="d")
+    j2 = Job(job_id="l:1", ats="lever", company="Acme", title="Software Engineer", location="Bangalore", url="https://example.com/job1", description="d")
+    j3 = Job(job_id="a:1", ats="ashby", company="Beta", title="Software Engineer", location="Hyderabad", url="https://example.com/job2", description="d")
+
+    unique, dropped = deduplicate([j1, j2, j3])
+    assert len(unique) == 2
+    assert dropped == 1
+
+
+def test_wellfound_parser():
+    """Verify Wellfound marketplace parser compatibility."""
+    from hirepilot.fetch import parse_wellfound
+    payload = {"jobs": [{"id": "wf1", "company_name": "AI Startup", "title": "AI Engineer Intern", "location": "Bangalore", "description": "<p>Build LLM agents.</p>", "url": "https://wellfound.com/jobs/wf1"}]}
+    jobs = parse_wellfound("ai-startup", "AI Startup", payload)
+    assert len(jobs) == 1
+    assert jobs[0].ats == "wellfound"
+    assert jobs[0].source_type == "marketplace"
+    assert jobs[0].company == "AI Startup"
+    assert "LLM agents" in jobs[0].description
+

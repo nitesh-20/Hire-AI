@@ -265,8 +265,4 @@ python -m hirepilot applied "lever:cred:123456"
 python -m hirepilot stats
 ```
 
----
 
-## License
-
-Distributed under the MIT License. See `LICENSE` for details.

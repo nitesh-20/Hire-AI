@@ -1,0 +1,300 @@
+# HirePilot AI configuration. Everything tunable lives here — no editing Python.
+#
+# Optimized for Nitesh's current profile:
+# AI Systems & Full-Stack Engineer
+# Targeting early-career Software / AI / Backend / Platform roles.
+#
+# Includes BOTH:
+# - Full-time roles
+# - Internship roles
+
+filters:
+
+  # --------------------------------------------------------------------------
+  # JOB TITLE FILTERS
+  # --------------------------------------------------------------------------
+
+  # A title must match at least one include AND zero excludes.
+
+  include_titles:
+
+    # ------------------------------------------------------------------------
+    # General Software Engineering
+    # ------------------------------------------------------------------------
+
+    - '\bsoftware\s+engineer\b'
+    - '\bsoftware\s+development\s+engineer\b'
+    - '\bsoftware\s+developer\b'
+    - '\bsde\b'
+    - '\bsde\s*-?\s*(i{1,3}|[123])\b'
+
+    # Software internships
+    - '\bsoftware\s+(engineering\s+)?intern\b'
+    - '\bsoftware\s+development\s+intern\b'
+    - '\bsde\s+intern\b'
+
+
+    # ------------------------------------------------------------------------
+    # Backend
+    # ------------------------------------------------------------------------
+
+    - '\bbackend\s+engineer\b'
+    - '\bback-end\s+engineer\b'
+    - '\bbackend\s+developer\b'
+    - '\bback-end\s+developer\b'
+    - '\bengineer\b.*\b(backend|back-end)\b'
+    - '\b(backend|back-end)\b.*\bengineer\b'
+
+    # Backend internships
+    - '\bbackend\s+intern\b'
+    - '\bback-end\s+intern\b'
+    - '\bbackend\s+engineering\s+intern\b'
+    - '\bbackend\s+developer\s+intern\b'
+
+
+    # ------------------------------------------------------------------------
+    # Full-Stack
+    # ------------------------------------------------------------------------
+
+    - '\bfull[\s-]*stack\s+engineer\b'
+    - '\bfull[\s-]*stack\s+developer\b'
+    - '\bengineer\b.*\bfull[\s-]*stack\b'
+    - '\bfull[\s-]*stack\b.*\bengineer\b'
+    - '\b(full[\s-]*stack|fullstack)\s+developer\b'
+
+    # Full-stack internships
+    - '\bfull[\s-]*stack\s+intern\b'
+    - '\bfull[\s-]*stack\s+engineering\s+intern\b'
+    - '\bfull[\s-]*stack\s+developer\s+intern\b'
+
+
+    # ------------------------------------------------------------------------
+    # AI / Generative AI / LLM
+    # ------------------------------------------------------------------------
+
+    - '\bai\s+engineer\b'
+    - '\bartificial\s+intelligence\s+engineer\b'
+    - '\bgenerative\s+ai\s+engineer\b'
+    - '\bgenai\s+engineer\b'
+    - '\bgen\s*ai\s+engineer\b'
+    - '\bllm\s+engineer\b'
+    - '\bllm\s+developer\b'
+    - '\bai\s+developer\b'
+    - '\bgenai\s+developer\b'
+    - '\bai\s+software\s+engineer\b'
+    - '\bsoftware\s+engineer\b.*\b(ai|llm|genai)\b'
+    - '\b(ai|llm|genai)\b.*\bsoftware\s+engineer\b'
+
+    # AI internships
+    - '\bai\s+intern\b'
+    - '\bartificial\s+intelligence\s+intern\b'
+    - '\bgenerative\s+ai\s+intern\b'
+    - '\bgenai\s+intern\b'
+    - '\bgen\s*ai\s+intern\b'
+    - '\bllm\s+intern\b'
+    - '\bllm\s+engineering\s+intern\b'
+    - '\bai\s+engineering\s+intern\b'
+    - '\bai\s+developer\s+intern\b'
+
+
+    # ------------------------------------------------------------------------
+    # Agentic AI / AI Systems
+    # ------------------------------------------------------------------------
+
+    - '\bagentic\s+ai\s+engineer\b'
+    - '\bagentic\s+engineer\b'
+    - '\bai\s+systems\s+engineer\b'
+    - '\bai\s+platform\s+engineer\b'
+    - '\bai\s+infrastructure\s+engineer\b'
+    - '\bai\s+applications?\s+engineer\b'
+    - '\bai\s+product\s+engineer\b'
+    - '\bai\s+solutions?\s+engineer\b'
+    - '\bai\s+automation\s+engineer\b'
+
+    # Agentic / AI systems internships
+    - '\bagentic\s+ai\s+intern\b'
+    - '\bagentic\s+ai\s+engineering\s+intern\b'
+    - '\bai\s+systems\s+intern\b'
+    - '\bai\s+platform\s+intern\b'
+
+
+    # ------------------------------------------------------------------------
+    # ML Engineering
+    # ------------------------------------------------------------------------
+
+    - '\bmachine\s+learning\s+engineer\b'
+    - '\bml\s+engineer\b'
+    - '\bmachine\s+learning\s+developer\b'
+    - '\bml\s+developer\b'
+    - '\bengineer\b.*\b(machine\s+learning|ml)\b'
+    - '\b(machine\s+learning|ml)\b.*\bengineer\b'
+
+    # ML internships
+    - '\bmachine\s+learning\s+intern\b'
+    - '\bmachine\s+learning\s+engineering\s+intern\b'
+    - '\bml\s+intern\b'
+    - '\bml\s+engineering\s+intern\b'
+
+
+    # ------------------------------------------------------------------------
+    # Python / API / Application Engineering
+    # ------------------------------------------------------------------------
+
+    - '\bpython\s+engineer\b'
+    - '\bpython\s+developer\b'
+    - '\bapi\s+engineer\b'
+    - '\bapplication\s+engineer\b'
+    - '\bapplication\s+software\s+engineer\b'
+
+    # Python / API internships
+    - '\bpython\s+intern\b'
+    - '\bpython\s+developer\s+intern\b'
+    - '\bapi\s+engineering\s+intern\b'
+    - '\bapplication\s+engineering\s+intern\b'
+
+
+    # ------------------------------------------------------------------------
+    # Platform / Infrastructure / Cloud
+    # ------------------------------------------------------------------------
+
+    - '\bplatform\s+engineer\b'
+    - '\bplatform\s+software\s+engineer\b'
+    - '\binfrastructure\s+engineer\b'
+    - '\binfra\s+engineer\b'
+    - '\bcloud\s+engineer\b'
+    - '\bcloud\s+software\s+engineer\b'
+    - '\bsite\s+reliability\s+engineer\b'
+    - '\bsre\b'
+    - '\bdevops\s+engineer\b'
+
+    # Platform / Cloud internships
+    - '\bplatform\s+intern\b'
+    - '\bplatform\s+engineering\s+intern\b'
+    - '\binfrastructure\s+intern\b'
+    - '\bcloud\s+intern\b'
+    - '\bcloud\s+engineering\s+intern\b'
+    - '\bdevops\s+intern\b'
+    - '\bsre\s+intern\b'
+
+
+    # ------------------------------------------------------------------------
+    # Systems / Distributed Systems
+    # ------------------------------------------------------------------------
+
+    - '\bsystems\s+engineer\b'
+    - '\bsystems\s+software\s+engineer\b'
+    - '\bdistributed\s+systems\s+engineer\b'
+    - '\bdistributed\s+systems\s+software\s+engineer\b'
+    - '\bperformance\s+engineer\b'
+
+
+    # ------------------------------------------------------------------------
+    # Product Engineering / Technical Roles
+    # ------------------------------------------------------------------------
+
+    - '\bproduct\s+engineer\b'
+    - '\bproduct\s+software\s+engineer\b'
+    - '\bmember\s+of\s+technical\s+staff\b'
+
+
+  # --------------------------------------------------------------------------
+  # EXCLUDED TITLES
+  # --------------------------------------------------------------------------
+
+  exclude_titles:
+
+    # Too senior
+    - '\b(staff|principal|distinguished|fellow|architect)\b'
+    - '\bsenior\b'
+    - '\b(senior\s+staff|staff\s+engineer)\b'
+    - '\b(director|vp|vice\s+president|head\s+of|chief|cto)\b'
+    - '\b(manager|management)\b'
+
+    # Keep "intern" and "internship" OUT of exclusions.
+    # Internship roles are intentionally included.
+
+    # Keep apprentice / trainee excluded because they are generally
+    # training-oriented rather than engineering hiring roles.
+    - '\b(apprentice|trainee)\b'
+
+
+    # ------------------------------------------------------------------------
+    # Non-engineering tracks
+    # ------------------------------------------------------------------------
+
+    - '\b(sales|account\s+executive|business\s+development|marketing)\b'
+    - '\b(recruit|recruiter|recruiting|talent\s+acquisition)\b'
+    - '\b(customer\s+support|technical\s+support|customer\s+success)\b'
+
+
+    # ------------------------------------------------------------------------
+    # Roles outside current target
+    # ------------------------------------------------------------------------
+
+    - '\b(frontend|front-end)\b'
+    - '\b(ios|android|mobile)\b'
+    - '\b(game|gaming)\s+engineer\b'
+    - '\bdesigner\b'
+    - '\bqa\s+engineer\b'
+    - '\btest\s+engineer\b'
+    - '\bdata\s+scientist\b'
+    - '\bresearch\s+scientist\b'
+    - '\bquantitative\s+researcher\b'
+    - '\bdata\s+analyst\b'
+
+
+  # --------------------------------------------------------------------------
+  # LOCATION
+  # --------------------------------------------------------------------------
+
+  locations:
+    - bangalore
+    - bengaluru
+    - raipur
+    - hyderabad
+    - gurgaon
+    - gurugram
+    - mumbai
+    - pune
+    - delhi
+    - noida
+    - chennai
+    - india
+
+  # Remote roles are valuable for this profile.
+  allow_remote: true
+
+
+  # --------------------------------------------------------------------------
+  # FRESHNESS
+  # --------------------------------------------------------------------------
+
+  # Only consider jobs posted/updated within the last 14 days.
+  max_age_days: 14
+
+
+# --- LLM stages -------------------------------------------------------------
+
+screen_batch_size: 8
+
+# Enough context to identify whether the role actually matches
+# AI / backend / full-stack experience.
+screen_jd_chars: 1800
+
+# More context when generating the application/digest.
+draft_jd_chars: 7000
+
+# Keep only strong matches.
+score_threshold: 7.0
+
+# Maximum high-quality opportunities per run.
+max_per_digest: 5
+
+
+# --- paths ------------------------------------------------------------------
+
+companies_file: companies.yaml
+profile_file: profile.json
+seen_file: seen.json
+digest_file: out/digest.html
+tracker_csv: out/tracker.csv

@@ -61,7 +61,7 @@ companies:
 - {ats: greenhouse, slug: couchbaseinc, name: Couchbase}
 - {ats: greenhouse, slug: striiminc, name: Striim}
 - {ats: greenhouse, slug: mesh, name: Mesh}
-- {ats: greenhouse, slug: eth0, name: Ethos Life}
+- {ats: greenhouse, slug: ethos, name: Ethos Life}
 
 - {ats: ashby, slug: plotlineso, name: Plotline}
 - {ats: ashby, slug: reo-dev, name: Reo.Dev}
@@ -70,7 +70,6 @@ companies:
 - {ats: ashby, slug: glomo, name: Glomo}
 - {ats: ashby, slug: metaforms, name: Metaforms}
 - {ats: ashby, slug: altimate, name: Altimate AI}
-- {ats: ashby, slug: keystone, name: Keystone}
 - {ats: ashby, slug: bespokelabs, name: Bespoke Labs}
 - {ats: ashby, slug: granica, name: Granica}
 - {ats: ashby, slug: anyscale, name: Anyscale}
@@ -87,9 +86,7 @@ companies:
 - {ats: lever, slug: stable-money1, name: Stable Money}
 - {ats: lever, slug: acceldata, name: Acceldata}
 - {ats: lever, slug: revefi, name: Revefi}
-- {ats: lever, slug: converseNow, name: ConverseNow}
 - {ats: lever, slug: neuron7, name: Neuron7}
 - {ats: lever, slug: getwingapp, name: Wing Assistant}
 - {ats: lever, slug: zaimler, name: zaimler}
 - {ats: lever, slug: Onehouse, name: Onehouse}
-- {ats: lever, slug: logik.io, name: Logik.io}

@@ -1,0 +1,20 @@
+# Virtual environment
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Environment & Credentials
+.env
+
+# User data & tracking state
+seen.json
+profile.json
+Nitesh07.pdf
+out/
+
+# IDE & OS files
+.DS_Store
+.vscode/
+.idea/
+.pytest_cache/

@@ -1,266 +1,264 @@
 # HirePilot AI
 
-**Find the right engineering jobs before everyone else.**
+> **Find the right engineering jobs before everyone else.**
+>
+> *AI-powered job intelligence for finding the right engineering opportunities.*
 
-*HirePilot AI — an AI-powered job intelligence and career automation system for software engineers.*
+HirePilot AI is an automated, AI-driven job discovery and career intelligence system designed specifically for software and AI engineers. It continuously monitors public Applicant Tracking System (ATS) job boards, filters out irrelevant postings using deterministic rules, and evaluates candidate fit using Large Language Models (LLMs).
 
-HirePilot AI reads public ATS APIs every morning, throws away the ~99% that don't fit you, scores what's left against your resume, drafts an application kit for the best few, and emails you a digest.
+Rather than forcing users to manually browse noisy job portals or spending unnecessary API tokens processing thousands of irrelevant listings, HirePilot AI operates in two distinct stages: a zero-cost deterministic pre-filtering pipeline followed by targeted LLM screening and application kit drafting.
 
-**It never submits an application.** It finds, filters, ranks and drafts. You
-read the digest, edit the cover note, and press submit yourself.
+The system surfaces only high-confidence job opportunities, generating an actionable daily HTML digest complete with match rationale, tailored resume bullet points, honest skill gap analyses, and customizable draft cover notes. HirePilot AI never automatically submits applications; it arms candidates with the insights and materials required to submit high-quality applications themselves.
 
 ```
-2000 postings  →  40 candidates  →  5 in your inbox
-   fetch          regex/location      LLM screen
-                  /freshness gate     + draft
-                  (free, no LLM)
++-------------------+      +-------------------------+      +-------------------+      +----------------------+
+|  1,300+ Raw Jobs  | ---> | Deterministic Filters   | ---> |   LLM Screening   | ---> |   HTML Email Digest  |
+|  Greenhouse/Lever |      | (Title/Location/Age)    |      |  (0-10 Fit Score) |      |   + CSV Tracker      |
+|  /Ashby ATS APIs  |      | [Free & Fast Pass]      |      | [Targeted AI Pass]|      | [Actionable Output]  |
++-------------------+      +-------------------------+      +-------------------+      +----------------------+
 ```
-
-> **New to Python?** Read **[SETUP.md](SETUP.md)** instead — it's a 13-step guide
-> that assumes you have nothing installed. This README assumes you're comfortable
-> with a terminal.
 
 ---
 
-## Run it in 30 seconds, no API key
+## Why HirePilot AI?
+
+Traditional job platforms present severe challenges for active software engineering candidates:
+* **Overwhelming Noise**: Commercial job boards index thousands of duplicate, outdated, or poorly targeted listings.
+* **LLM Cost & Speed Bottlenecks**: Feeding raw job feeds directly into AI models is cost-prohibitive and slow.
+* **Lack of Personalization**: Generic search engines rely on simple keyword matches that ignore candidate seniority, domain alignment, and tech stack match.
+
+HirePilot AI addresses these issues directly:
+1. **Zero-Token Pre-filtering**: Drops ~99% of non-matching postings via regex and deterministic metadata gates before spending a single LLM token.
+2. **Precision Fit Evaluation**: Scores surviving job descriptions (0–10) against candidate profiles parsed from real resumes.
+3. **Application Intelligence**: Automatically drafts role-specific resume bullet points, cover note drafts, and interview questions for top-tier matches.
+4. **Stateful Deduplication & Tracking**: Records seen jobs and application statuses locally to ensure you never review the same posting twice.
+
+---
+
+## Core Features
+
+### 1. ATS Job Discovery
+HirePilot AI fetches open postings directly from official, unauthenticated public ATS endpoints—eliminating the need for fragile web scrapers or accounts:
+* **Greenhouse API**: Fetches active job listings via `boards-api.greenhouse.io`.
+* **Lever API**: Fetches postings via `api.lever.co`.
+* **Ashby API**: Fetches job board data via `api.ashbyhq.com`.
+
+Target companies and their respective ATS slugs are configurable in [`companies.yaml`](companies.yaml).
+
+### 2. Deterministic Pre-Filtering
+Before executing AI evaluations, job listings pass through a fast, cost-free filtering stage configured in [`config.yaml`](config.yaml):
+* **Title Regex Inclusion & Exclusion**: Matches job titles against regex patterns (e.g., matching backend, full-stack, AI, systems roles while excluding senior management, internships, or irrelevant disciplines).
+* **Location Gate**: Filters by target cities or regions (e.g., Bengaluru, Hyderabad, India).
+* **Remote Role Support**: Passes postings marked as remote even if the primary location differs.
+* **Freshness Threshold (`max_age_days`)**: Excludes stale job listings older than a specified number of days.
+
+### 3. AI Candidate Screening & Fit Scoring
+Jobs passing pre-filters are evaluated by an LLM against the candidate's [`profile.json`](profile.json):
+* **Batch Processing**: Groups job descriptions into batches (`screen_batch_size`) for optimal throughput and reduced latency.
+* **Context Truncation**: Truncates raw HTML job descriptions to essential text (`screen_jd_chars`) to control token consumption.
+* **Fit Scoring (0.0–10.0)**: Scores candidates on genuine match quality and filters out listings below `score_threshold` (default `7.0`).
+
+### 4. Application Kit Drafting
+For jobs clearing the match score threshold, a high-tier LLM stage generates a custom application kit:
+* **Fit Summary**: Concise breakdown of why the candidate is a strong match.
+* **Tailored Resume Bullets**: Role-specific experience highlights ready to drop into a resume.
+* **Honest Skill Gaps**: Highlights missing requirements or experience gaps to prepare for interviews.
+* **Draft Cover Note**: Personalized introductory message for hiring managers.
+* **Interview Questions**: Candidate-to-interviewer questions tailored to the company's stack and role requirements.
+
+### 5. HTML Job Digest & Email Delivery
+* **Inline HTML Digest**: Builds a clean, responsive HTML document (`out/digest.html`) formatted specifically for desktop and mobile email clients.
+* **SMTP Email Delivery**: When invoked with `--send`, transmits the daily digest via standard SMTP (e.g., Gmail with App Passwords).
+
+### 6. Job Tracking & Deduplication
+* **State Preservation (`seen.json`)**: Tracks every evaluated job ID (`{ats}:{slug}:{id}`) to guarantee zero repeated reviews across daily runs.
+* **Application Lifecycle Tracking**: Mark applied jobs via CLI (`python -m hirepilot applied <job_id>`).
+* **CSV Export (`out/tracker.csv`)**: Export analytics and status data for tracking in Excel or Google Sheets.
+
+---
+
+## Architecture
+
+### System Execution Flow
+
+```mermaid
+flowchart TD
+    A[Start Daily Run] --> B[Load Config & Companies]
+    B --> C[Fetch Public ATS Boards\nGreenhouse / Lever / Ashby]
+    C --> D[Parse & Normalize Jobs]
+    D --> E[Deduplicate via seen.json]
+    E --> F[Deterministic Prefilter\nTitle / Location / Freshness]
+    F --> G{Jobs Remaining?}
+    G -- No --> H[Generate Empty Digest & Exit]
+    G -- Yes --> I[LLM Screening Stage\nBatch Evaluation 0-10 Score]
+    I --> J{Score >= Threshold?}
+    J -- No --> H
+    J -- Yes --> K[LLM Drafting Stage\nTailored Bullets & Cover Note]
+    K --> L[Build HTML Digest & Update Tracker]
+    L --> M{Flag --send set?}
+    M -- Yes --> N[Send Email via SMTP]
+    M -- No --> O[Save out/digest.html]
+    N --> P[Finish Execution]
+    O --> P
+```
+
+### Project Layout
+
+```
+HirePilot-AI/
+├── hirepilot/                 # Core Python package
+│   ├── __init__.py           # Package initialization
+│   ├── __main__.py           # CLI entrypoint module
+│   ├── cli.py                # Command-line interface parser & command handlers
+│   ├── fetch.py              # ATS board fetchers & HTML text normalization
+│   ├── prefilter.py          # Deterministic title, location, and age filters
+│   ├── providers.py          # LLM provider abstractions (Gemini, Anthropic, Groq, Ollama)
+│   ├── llm.py                # Screening, drafting, and profile extraction pipelines
+│   ├── digest.py             # HTML digest document builder
+│   ├── mailer.py             # SMTP email delivery client
+│   ├── store.py              # Deduplication store (seen.json) & CSV tracker exporter
+│   └── mock.py               # Fixture generator for offline testing
+├── config.yaml               # Job search filters, LLM parameters, and path settings
+├── companies.yaml            # List of targeted ATS company boards
+├── profile.example.json      # Sample candidate profile schema
+├── profile.json              # Candidate profile (generated/edited)
+├── requirements.txt          # Package dependencies
+├── tests/                    # Test suite (parsers, prefilters, LLM mock tests)
+│   ├── test_parsers.py
+│   └── test_llm.py
+├── .env.example              # Environment variables template
+└── README.md                 # Documentation
+```
+
+---
+
+## Supported LLM Providers
+
+HirePilot AI features a swappable provider interface ([`hirepilot/providers.py`](hirepilot/providers.py)). Screening and drafting stages can use different models independently:
+
+| Provider | Provider Key | Environment Variable | PDF Resume Parsing | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| **Google Gemini** | `gemini` | `GEMINI_API_KEY` | Yes | Highly cost-effective; recommended default |
+| **Anthropic Claude** | `anthropic` | `ANTHROPIC_API_KEY` | Yes | Uses official Anthropic SDK |
+| **Groq** | `groq` | `GROQ_API_KEY` | No | Ultra-fast inference for screening |
+| **OpenAI-Compatible** | `openai-compatible` | `GROQ_API_KEY` + `LLM_BASE_URL` | No | Supports OpenRouter, Together AI, vLLM |
+| **Ollama** | `ollama` | None | No | Fully local LLM execution via `OLLAMA_HOST` |
+| **Keyword Stub** | `--scorer keyword` | None | No | Offline token-overlap fallback for dry runs |
+
+---
+
+## Quickstart & Setup Guide
+
+### 1. Clone & Setup Virtual Environment
 
 ```bash
-git clone <your-repo> && cd HirePilot_AI
-python -m venv .venv && .venv/Scripts/activate      # Windows
-# python -m venv .venv && source .venv/bin/activate # macOS/Linux
-pip install -r requirements.txt
+# Clone repository
+git clone https://github.com/nitesh-20/Hire-AI.git
+cd Hire-AI
 
+# Create & activate virtual environment
+python3 -m venv .venv
+source .venv/bin/activate    # On Windows: .venv\Scripts\Activate.ps1
+
+# Install requirements
+pip install -r requirements.txt
+```
+
+### 2. Verify Installation (Offline Mock Test)
+
+Run the test suite and an offline mock execution without needing network access or API keys:
+
+```bash
+# Run automated tests
+pytest
+
+# Execute offline mock pipeline run
 python -m hirepilot run --mock --scorer keyword
 ```
 
-`--mock` runs bundled fixtures through the **real parsers** — no network.
-`--scorer keyword` swaps the LLM for a dumb token-overlap stub, so the whole
-pipeline runs with no secrets configured. You should see:
-
-```
-[2/5] filtering
-  prefilter: 12 -> 5 (dropped title=5 location=1 stale=1)
-[3/5] screening 5 jobs (keyword stub — DEV ONLY)
-  3 scored >= 7.0
-[5/5] digest
-  wrote out/digest.html
-
-funnel: 12 scanned -> 5 passed filters -> 5 new -> 3 in digest
-```
-
-Open `out/digest.html` in a browser. That's the email you'd have received.
-
-> The keyword scorer is **dev-only**. It cannot tell a Staff role from a
-> new-grad one and has no idea what the words mean. It exists to prove the
-> plumbing, never to build a digest you'd act on.
+Open `out/digest.html` in your browser to view the generated sample digest.
 
 ---
 
-## Set it up for real
+## Configuration & Usage
 
-### 1. Point it at companies you'd actually join
+### 1. Configure Environment Credentials
 
-Edit `companies.yaml`. The slug is the last path segment of a company's public
-careers board:
-
-| Board URL | `ats` | `slug` |
-|---|---|---|
-| `boards.greenhouse.io/stripe` | `greenhouse` | `stripe` |
-| `jobs.lever.co/netlify` | `lever` | `netlify` |
-| `jobs.ashbyhq.com/ramp` | `ashby` | `ramp` |
-
-The shipped list is **examples** — verify each before trusting the output.
-Companies migrate between ATS vendors and slugs go dead. A dead slug prints an
-HTTP status and returns nothing; it never kills the run. Watch the per-board
-counts on stdout: a board reporting 0 every day is a slug that needs fixing.
-
-Start with 10–15 companies. A list of 200 is mostly noise.
-
-**No LinkedIn or Naukri.** Neither has a public API and scraping them violates
-their terms of service. The three ATS endpoints above are documented, unauthenticated,
-and intended to be read.
-
-### 2. Tune the filters
-
-`config.yaml` holds the deterministic gate that runs **before** any LLM call.
-This is the whole cost story — get it right and you spend cents a day.
-
-```yaml
-filters:
-  include_titles: ['\bsde\b', 'software development engineer', ...]
-  exclude_titles: ['\b(staff|principal)\b', '\b(manager)\b', ...]
-  locations: [bangalore, bengaluru, india]
-  allow_remote: true
-  max_age_days: 30
-score_threshold: 7.0
-max_per_digest: 5
-```
-
-> **`sde` does not match "Software Development Engineer".** They share no
-> substring. Use `\bsde\b` for the acronym *and* list the spelled-out variants
-> separately, or you'll silently miss half of Amazon-style postings. There's a
-> test pinning this.
-
-### 3. Build your profile
+Create a `.env` file from `.env.example`:
 
 ```bash
-cp .env.example .env      # add ANTHROPIC_API_KEY or GEMINI_API_KEY
-python -m hirepilot profile --resume resume.pdf
+cp .env.example .env
 ```
 
-PDFs go over as a base64 document block (Anthropic and Gemini both read them
-natively — no OCR, no text extraction library). `.txt` and `.md` also work and
-are the fallback for providers that can't take documents.
+Edit `.env` to supply your credentials:
 
-This writes `profile.json`. It's gitignored — read it, fix anything the model
-got wrong, and keep it out of version control.
+```env
+LLM_PROVIDER=gemini
+GEMINI_API_KEY=your_gemini_api_key_here
+SCREEN_MODEL=gemini-3.5-flash-lite
+DRAFT_MODEL=gemini-3.6-flash
 
-### 4. Run it
+# Email configuration (Optional, for --send)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_gmail_app_password
+MAIL_TO=your_email@gmail.com
+```
+
+### 2. Build Candidate Profile
+
+Generate your `profile.json` directly from your resume (`.pdf`, `.txt`, or `.md`):
 
 ```bash
-python -m hirepilot run                    # build the digest
-python -m hirepilot run --send             # ...and email it
-python -m hirepilot run --limit 10         # cost guard while tuning
-python -m hirepilot run --no-draft         # screen only, skip the expensive pass
+python -m hirepilot profile --resume path/to/your_resume.pdf
 ```
+
+Review and customize the generated `profile.json` file.
+
+### 3. Customize Company Boards & Filters
+
+* Edit [`companies.yaml`](companies.yaml) to target specific company ATS boards:
+  ```yaml
+  companies:
+    - {ats: greenhouse, slug: razorpaysoftwareprivatelimited, name: Razorpay}
+    - {ats: lever, slug: cred, name: CRED}
+    - {ats: ashby, slug: openai, name: OpenAI}
+  ```
+* Edit [`config.yaml`](config.yaml) to adjust job title regex patterns, target locations, max posting age, and LLM score thresholds.
 
 ---
 
-## Picking providers
+## Command Reference
 
-Screening reads hundreds of jobs and wants the cheapest decent model. Drafting
-runs ~5 times and wants the best one. So they're configured separately:
+### Execute Daily Pipeline
 
 ```bash
-LLM_PROVIDER=anthropic          # sets both stages
-SCREEN_PROVIDER=groq            # ...override per stage
-DRAFT_PROVIDER=anthropic
-SCREEN_MODEL=claude-haiku-4-5-20251001
-DRAFT_MODEL=claude-sonnet-5
+# Run pipeline with a limit of 10 jobs (Cost guard for initial testing)
+python -m hirepilot run --limit 10
+
+# Run full pipeline and output to out/digest.html
+python -m hirepilot run
+
+# Run full pipeline and send HTML digest via SMTP email
+python -m hirepilot run --send
+
+# Run screening pass only (Skip kit drafting stage to save tokens)
+python -m hirepilot run --no-draft
 ```
 
-| Provider | Value | Key | PDF resumes | Notes |
-|---|---|---|---|---|
-| Anthropic | `anthropic` | `ANTHROPIC_API_KEY` | yes | default; uses the official SDK |
-| Google Gemini | `gemini` | `GEMINI_API_KEY` | yes | generous free tier |
-| Groq | `groq` | `GROQ_API_KEY` | no | very fast, free tier |
-| OpenAI-compatible | `openai-compatible` | `GROQ_API_KEY` + `LLM_BASE_URL` | no | Together, OpenRouter, vLLM |
-| Ollama | `ollama` | none | no | fully local, `OLLAMA_HOST` |
-
-Everything except Anthropic goes over plain `requests`, so you can delete the
-`anthropic` line from `requirements.txt` and still run the whole thing.
-
-Adding a provider is one class in [`hirepilot/providers.py`](hirepilot/providers.py)
-with a `complete()` method, plus an entry in the `PROVIDERS` dict.
-
----
-
-## Tracking
-
-`seen.json` is both the dedupe index and the application tracker — a job you've
-already been shown is never shown again. It's gitignored: it's yours, and
-shipping one would break the first run for anyone who cloned the repo.
+### Track Applications & View Analytics
 
 ```bash
-python -m hirepilot applied "greenhouse:stripe:5501001"   # id is in the digest
-python -m hirepilot stats                                 # + CSV export
-```
+# Mark a job ID as applied
+python -m hirepilot applied "lever:cred:123456"
 
-`out/tracker.csv` opens in any spreadsheet.
+# Print tracking analytics and export out/tracker.csv
+python -m hirepilot stats
+```
 
 ---
 
-## Scheduling
+## License
 
-[`.github/workflows/daily.yml`](.github/workflows/daily.yml) runs it at 06:00 IST
-on weekdays. `seen.json` is carried between runs with `actions/cache`, not
-committed — it's personal, and a `seen.json` in the repo would mark every job as
-already-seen for anyone who cloned it. Nothing personal ever enters git.
-
-Repository **secrets** to set (Settings → Secrets and variables → Actions):
-
-| Secret | What |
-|---|---|
-| `PROFILE_JSON` | the entire contents of your local `profile.json` |
-| `ANTHROPIC_API_KEY` | (or `GEMINI_API_KEY` / `GROQ_API_KEY`) |
-| `SMTP_USER` / `SMTP_PASS` | Gmail address + **App Password**, not your login |
-| `MAIL_TO` | where the digest goes |
-
-Optional repository **variables**: `LLM_PROVIDER`, `SCREEN_PROVIDER`,
-`DRAFT_PROVIDER`, `SCREEN_MODEL`, `DRAFT_MODEL`.
-
-Trigger it by hand first — Actions → *daily job digest* → *Run workflow*, with
-`dry_run` ticked to build the digest artifact without emailing.
-
-Gmail needs an [App Password](https://myaccount.google.com/apppasswords); your
-normal password stops working once 2FA is on.
-
----
-
-## Layout
-
-```
-hirepilot/
-  fetch.py       Job dataclass, strip_html, 3 pure parsers, fetch_all
-  prefilter.py   title/location/freshness gate — no LLM, no cost
-  providers.py   the swappable provider interface + 5 backends
-  llm.py         screen() / draft() / build_profile() / keyword stub
-  digest.py      HTML email (inline CSS only — Gmail strips <style>)
-  mailer.py      SMTP
-  store.py       seen.json dedupe + tracker + CSV export
-  mock.py        fixtures in each ATS's native JSON shape
-  cli.py         argparse: profile / run / applied / stats
-config.yaml      filters, thresholds, paths
-companies.yaml   boards to poll
-tests/           55 tests, no network, no key
-```
-
-HTTP is kept out of the parsers on purpose. Each `parse_*(slug, company, body)`
-takes already-decoded JSON and returns `list[Job]`, which is what makes `--mock`
-exercise the real code path instead of a parallel implementation.
-
-Every job gets `job_id = "{ats}:{slug}:{id}"` — globally unique, so the same
-role posted on two boards is still two rows, and a re-run never duplicates.
-
-### ATS quirks the parsers handle
-
-- **Greenhouse** — `content` is HTML-entity-escaped HTML. Unescape *before*
-  stripping tags and again after, or you ship `&amp;` into the prompt.
-- **Lever** — `createdAt` is epoch **milliseconds**. The full JD is split across
-  `descriptionPlain` **+** `lists[].text` **+** `lists[].content` **+**
-  `additionalPlain`; concatenate all four or you lose the requirements section
-  and every job looks unqualified.
-- **Ashby** — skip `isListed: false`; those are unpublished drafts.
-
----
-
-## Tests
-
-```bash
-python -m pytest tests -q
-```
-
-No network, no API key, no cost. The suite covers:
-
-- each parser against fixtures in its **native** ATS shape
-- the two bugs that cost me an evening each: Lever's epoch-ms timestamps
-  (fixture dates are generated relative to *now*, never hardcoded, so they
-  can't silently age past the freshness gate) and the `\bsde\b` regex
-- prefilter rejects the planted junk: wrong seniority, wrong city, wrong
-  function, a stale posting, an unlisted Ashby draft
-- the LLM layer with the provider stubbed: batching splits at the configured
-  size, JD truncation is applied before send, fenced/preamble/object-or-array
-  JSON all parse, scores land on the right job when returned out of order, a
-  failed batch warns and the run continues, and the draft kit always has every
-  key the digest renders
-
----
-
-## Cost
-
-With ~15 boards, a tight `config.yaml`, Haiku screening and Sonnet drafting,
-this lands in the low single-digit rupees per day. The prefilter is what makes
-that true: nothing reaches a model until it has already passed title, location
-and freshness. Set `SCREEN_PROVIDER=groq` or `gemini` and it's free.
-
-Use `--limit` while tuning filters so a bad regex can't run up a bill.
+Distributed under the MIT License. See `LICENSE` for details.

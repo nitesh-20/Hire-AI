@@ -23,18 +23,73 @@
 # noise and makes the prefilter counts impossible to reason about.
 
 companies:
-  - {ats: greenhouse, slug: razorpaysoftwareprivatelimited, name: Razorpay}
-  - {ats: greenhouse, slug: PhonePe, name: PhonePe}
-  - {ats: greenhouse, slug: groww, name: Groww}
-  - {ats: lever, slug: cred, name: CRED}
-  - {ats: ashby, slug: sarvam, name: Sarvam AI}
-  - {ats: ashby, slug: ema, name: Ema}
-  - {ats: ashby, slug: bolna, name: Bolna AI}
-  - {ats: ashby, slug: wisdom-ai, name: WisdomAI}
-  - {ats: ashby, slug: nightfall-ai, name: Nightfall AI}
-  - {ats: ashby, slug: fiddler-ai, name: Fiddler AI}
-  - {ats: ashby, slug: ramp, name: Ramp}
-  - {ats: ashby, slug: openai, name: OpenAI}
-  - {ats: ashby, slug: notion, name: Notion}
-  - {ats: ashby, slug: plaid, name: Plaid}
-  - {ats: lever, slug: gushwork, name: Gushwork}
+
+- {ats: greenhouse, slug: razorpaysoftwareprivatelimited, name: Razorpay}
+- {ats: greenhouse, slug: PhonePe, name: PhonePe}
+- {ats: greenhouse, slug: groww, name: Groww}
+- {ats: lever, slug: cred, name: CRED}
+- {ats: ashby, slug: sarvam, name: Sarvam AI}
+- {ats: ashby, slug: ema, name: Ema}
+- {ats: ashby, slug: bolna, name: Bolna AI}
+- {ats: ashby, slug: wisdom-ai, name: WisdomAI}
+- {ats: ashby, slug: nightfall-ai, name: Nightfall AI}
+- {ats: ashby, slug: fiddler-ai, name: Fiddler AI}
+- {ats: ashby, slug: ramp, name: Ramp}
+- {ats: ashby, slug: openai, name: OpenAI}
+- {ats: ashby, slug: notion, name: Notion}
+- {ats: ashby, slug: plaid, name: Plaid}
+- {ats: lever, slug: gushwork, name: Gushwork}
+
+- {ats: greenhouse, slug: stripe, name: Stripe}
+- {ats: greenhouse, slug: gleanwork, name: Glean}
+- {ats: greenhouse, slug: instead, name: Instead}
+- {ats: greenhouse, slug: knowbe4, name: KnowBe4}
+- {ats: greenhouse, slug: hackerrank, name: HackerRank}
+- {ats: greenhouse, slug: bitgo, name: BitGo}
+- {ats: greenhouse, slug: cognite, name: Cognite}
+- {ats: greenhouse, slug: britive, name: Britive}
+- {ats: greenhouse, slug: appomni, name: AppOmni}
+- {ats: greenhouse, slug: forwardnetworks, name: Forward Networks}
+- {ats: greenhouse, slug: jazzx-ai, name: JazzX AI}
+- {ats: greenhouse, slug: konovo, name: Konovo}
+- {ats: greenhouse, slug: skillzinc, name: Skillz}
+- {ats: greenhouse, slug: celonis, name: Celonis}
+- {ats: greenhouse, slug: speechify, name: Speechify}
+- {ats: greenhouse, slug: gitlab, name: GitLab}
+- {ats: greenhouse, slug: conga, name: Conga}
+- {ats: greenhouse, slug: cleoindia, name: Cleo}
+- {ats: greenhouse, slug: couchbaseinc, name: Couchbase}
+- {ats: greenhouse, slug: striiminc, name: Striim}
+- {ats: greenhouse, slug: mesh, name: Mesh}
+- {ats: greenhouse, slug: eth0, name: Ethos Life}
+
+- {ats: ashby, slug: plotlineso, name: Plotline}
+- {ats: ashby, slug: reo-dev, name: Reo.Dev}
+- {ats: ashby, slug: flagright.com, name: Flagright}
+- {ats: ashby, slug: span, name: SPAN}
+- {ats: ashby, slug: glomo, name: Glomo}
+- {ats: ashby, slug: metaforms, name: Metaforms}
+- {ats: ashby, slug: altimate, name: Altimate AI}
+- {ats: ashby, slug: keystone, name: Keystone}
+- {ats: ashby, slug: bespokelabs, name: Bespoke Labs}
+- {ats: ashby, slug: granica, name: Granica}
+- {ats: ashby, slug: anyscale, name: Anyscale}
+- {ats: ashby, slug: kaigentic, name: kAIgentic}
+- {ats: ashby, slug: spector-ai, name: Spector.ai}
+- {ats: ashby, slug: hellyeah, name: HellYeah}
+- {ats: ashby, slug: atob, name: AtoB}
+- {ats: ashby, slug: libra, name: Libra AI}
+- {ats: ashby, slug: noon-design, name: Noon}
+- {ats: ashby, slug: oneapp, name: OnePay}
+- {ats: ashby, slug: josys, name: JOSYS}
+- {ats: ashby, slug: almabase, name: Almabase}
+
+- {ats: lever, slug: stable-money1, name: Stable Money}
+- {ats: lever, slug: acceldata, name: Acceldata}
+- {ats: lever, slug: revefi, name: Revefi}
+- {ats: lever, slug: converseNow, name: ConverseNow}
+- {ats: lever, slug: neuron7, name: Neuron7}
+- {ats: lever, slug: getwingapp, name: Wing Assistant}
+- {ats: lever, slug: zaimler, name: zaimler}
+- {ats: lever, slug: Onehouse, name: Onehouse}
+- {ats: lever, slug: logik.io, name: Logik.io}

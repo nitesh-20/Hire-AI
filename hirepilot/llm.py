@@ -128,19 +128,23 @@ Score 0-10 on genuine fit:
   5-6   plausible but real gaps
   0-4   wrong seniority, wrong stack, or a hard requirement the candidate lacks
 
-Seniority mismatch is the most common failure: a 3-year engineer scoring an 8
-on a Staff role is wrong. Penalise it hard, in both directions — a senior
-engineer does not want an internship either. Do the same for hard requirements
-the candidate plainly does not meet: security clearance, a specific degree, a
-named technology with a year count they cannot hit, or a country they cannot
-work in.
+EVALUATION CRITERIA:
+1. Technical skill match (tech stack alignment)
+2. Project/domain relevance
+3. Experience-level compatibility (HARD CONSTRAINT):
+   Candidate Target Experience Range: 0-2 years of professional experience, Internships, Entry-Level, New Grad, Early Career.
+   - ALLOWED: Internships, Entry Level, New Grad, 0-1 years, 1-2 years, 0-2 years, 1+ years, or roles with no prior experience required.
+   - REQUIRED vs PREFERRED: If 3+ years is stated as PREFERRED or OPTIONAL, but the role accepts 0-2 years or fresh grads, do NOT reject.
+   - HARD REJECT (Score 0-4 strictly): If the Job Description explicitly REQUIRES 3+ years, 3-5 years, 4+ years, 5+ years, or minimum 3 years of relevant professional experience. Set reason: "Requires X+ years experience; exceeds target 0-2 years range".
+   - UNSPECIFIED EXPERIENCE: If experience years are not explicitly stated in the JD, infer from the job title and responsibilities. Do NOT reject solely because experience numbers are missing.
+4. Location compatibility
+5. Overall role suitability
 
 Do not inflate scores to be encouraging. Most postings are a 4.
 
 Return ONLY a JSON array, one object per job, no prose:
 [{"job_id": str, "score": number, "reason": str}]
-Echo `job_id` back exactly as given. `reason` is one sentence, max 20 words,
-concrete about the deciding factor."""
+Echo `job_id` back exactly as given. `reason` is one sentence, max 20 words, concrete about the deciding factor."""
 
 
 def screen(jobs: list[Job], profile: dict, batch_size: int = 8, jd_chars: int = 1400,
@@ -258,17 +262,22 @@ def draft(jobs: list[Job], profile: dict, jd_chars: int = 6000,
 # ------------------------------------------------- offline scorer (no API) ---
 
 def keyword_screen(jobs: list[Job], profile: dict, **_) -> list[Job]:
-    """DEV ONLY. Token-overlap stand-in so the pipeline runs with no API key.
-
-    This is not a matcher. It cannot tell a Staff role from a new-grad one and
-    it has no idea what the words mean. It exists so `--mock --scorer keyword`
-    proves the plumbing end-to-end on a laptop with no secrets configured.
-    Never ship a digest built from these scores.
-    """
+    """DEV ONLY. Token-overlap stand-in so the pipeline runs with no API key."""
     skills = {s.lower() for s in profile.get("core_skills", []) if s}
     titles = [t.lower() for t in profile.get("target_titles", []) if t]
+    senior_req = re.compile(
+        r'\b([3-9]|\d{2,})\s*(\+|\s*-\s*\d+)?\s*(years?|yrs?)\s+(of\s+)?(relevant\s+)?experience\s+required\b|'
+        r'\bminimum\s+([3-9]|\d{2,})\s*(years?|yrs?)\b|'
+        r'\bat\s+least\s+([3-9]|\d{2,})\s*(years?|yrs?)\b|'
+        r'\b([3-9]|\d{2,})\+\s*years?\s+(of\s+)?experience\b',
+        re.I
+    )
     for j in jobs:
         blob = f"{j.title} {j.description}".lower()
+        if senior_req.search(j.description) and "preferred" not in j.description.lower():
+            j.score = 3.0
+            j.reason = "[keyword stub] rejected: requires 3+ years experience"
+            continue
         hits = sorted(s for s in skills if s in blob)
         overlap = len(hits) / max(len(skills), 1)
         title_bonus = 2.5 if any(t in j.title.lower() for t in titles) else 0.0

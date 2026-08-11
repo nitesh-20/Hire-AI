@@ -126,6 +126,10 @@ def cmd_run(args) -> int:
         print(f"\nnothing new today. preview: {path}")
         return 0
 
+    target_exp = cfg.get("target_experience")
+    if target_exp and "target_experience" not in profile:
+        profile = dict(profile, target_experience=target_exp)
+
     # ---- 3. screen
     scorer = "keyword" if args.scorer == "keyword" else "llm"
     if scorer == "keyword":
@@ -155,7 +159,9 @@ def cmd_run(args) -> int:
     top_n = int(cfg.get("max_per_digest", 5))
     shortlist = sorted([j for j in jobs if (j.score or 0) >= threshold],
                        key=lambda j: j.score or 0, reverse=True)[:top_n]
-    print(f"  {len(shortlist)} scored >= {threshold}")
+    exp_rejected = sum(1 for j in jobs if (j.score or 0) < threshold and any(k in (j.reason or "").lower() for k in ("year", "experience", "seniority", "exceeds", "rejected")))
+    below_thresh = sum(1 for j in jobs if (j.score or 0) < threshold) - exp_rejected
+    print(f"  screened: {len(jobs)} | experience/seniority rejected: {exp_rejected} | below threshold: {below_thresh} | passed threshold ({threshold}): {len(shortlist)}")
 
     # ---- 4. draft
     print(f"\n[4/5] drafting kits for {len(shortlist)}")

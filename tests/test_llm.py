@@ -352,3 +352,25 @@ def test_both_stages_ask_for_json_mode_and_leave_room_for_thinking():
 def test_providers_without_document_support_say_so():
     with pytest.raises(providers.UnsupportedDocument):
         providers.GroqProvider().complete_document("m", "prompt", b"%PDF", 100)
+
+
+def test_keyword_scorer_experience_rejection():
+    """Keyword scorer should penalize 3+ years required experience JDs."""
+    intern_job = Job(job_id="g:1", ats="greenhouse", company="A", title="AI Engineer Intern",
+                     location="Bangalore", url="u1", description="Go, Python, Machine Learning. Internship for 2026/2027 grads.")
+    early_job = Job(job_id="g:2", ats="greenhouse", company="B", title="Software Engineer I",
+                    location="Bangalore", url="u2", description="Python, Go. 0-2 years of experience required.")
+    senior_job = Job(job_id="g:3", ats="greenhouse", company="C", title="Software Engineer",
+                     location="Bangalore", url="u3", description="Python, Go. 5+ years of relevant experience required.")
+    preferred_job = Job(job_id="g:4", ats="greenhouse", company="D", title="Software Engineer",
+                        location="Bangalore", url="u4", description="Python, Go. 0-2 years experience. 3+ years preferred.")
+
+    profile = {"core_skills": ["Python", "Go"], "target_titles": ["Software Engineer"], "years_experience": 1}
+    llm.keyword_screen([intern_job, early_job, senior_job, preferred_job], profile)
+
+    assert intern_job.score >= 6.0
+    assert early_job.score >= 6.0
+    assert senior_job.score <= 4.0
+    assert "requires 3+ years" in senior_job.reason
+    assert preferred_job.score >= 6.0
+

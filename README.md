@@ -225,7 +225,15 @@ Review and customize the generated `profile.json` file.
     - {ats: lever, slug: cred, name: CRED}
     - {ats: ashby, slug: openai, name: OpenAI}
   ```
-* Edit [`config.yaml`](config.yaml) to adjust job title regex patterns, target locations, max posting age, and LLM score thresholds.
+* Edit [`config.yaml`](config.yaml) to adjust target experience parameters (`min_years: 0`, `max_years: 2`, `internships: true`, `new_grad: true`), job title regex patterns, target locations, max posting age, and LLM score thresholds:
+  ```yaml
+  target_experience:
+    min_years: 0
+    max_years: 2
+    internships: true
+    new_grad: true
+    entry_level: true
+  ```
 
 ---
 

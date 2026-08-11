@@ -26,7 +26,7 @@ companies:
   - {ats: greenhouse, slug: razorpaysoftwareprivatelimited, name: Razorpay}
   - {ats: greenhouse, slug: PhonePe, name: PhonePe}
   - {ats: greenhouse, slug: groww, name: Groww}
-  - {ats: ashby, slug: cred, name: CRED}
+  - {ats: lever, slug: cred, name: CRED}
   - {ats: ashby, slug: sarvam, name: Sarvam AI}
   - {ats: ashby, slug: ema, name: Ema}
   - {ats: ashby, slug: bolna, name: Bolna AI}
@@ -36,5 +36,5 @@ companies:
   - {ats: ashby, slug: ramp, name: Ramp}
   - {ats: ashby, slug: openai, name: OpenAI}
   - {ats: ashby, slug: notion, name: Notion}
-  - {ats: greenhouse, slug: plaid, name: Plaid}
+  - {ats: ashby, slug: plaid, name: Plaid}
   - {ats: lever, slug: gushwork, name: Gushwork}

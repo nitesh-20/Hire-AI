@@ -232,18 +232,22 @@ def cmd_stats(args) -> int:
 
 def main(argv=None) -> int:
     _load_env()
+    base_p = argparse.ArgumentParser(add_help=False)
+    base_p.add_argument("--config", default=argparse.SUPPRESS, help="path to config file (default: config.yaml)")
+
     p = argparse.ArgumentParser(
         prog="hirepilot",
-        description="HirePilot AI — Personal job intelligence agent. Finds and drafts; never submits.")
-    p.add_argument("--config", default="config.yaml")
+        description="HirePilot AI — Personal job intelligence agent. Finds and drafts; never submits.",
+        parents=[base_p],
+    )
     sub = p.add_subparsers(dest="cmd", required=True)
 
-    sp = sub.add_parser("profile", help="turn a resume into profile.json")
+    sp = sub.add_parser("profile", help="turn a resume into profile.json", parents=[base_p])
     sp.add_argument("--resume", required=True, help="path to a .pdf, .txt or .md resume")
     sp.add_argument("--out", default="profile.json")
     sp.set_defaults(func=cmd_profile)
 
-    sr = sub.add_parser("run", help="run the daily pipeline")
+    sr = sub.add_parser("run", help="run the daily pipeline", parents=[base_p])
     sr.add_argument("--mock", action="store_true", help="bundled fixtures, no network")
     sr.add_argument("--scorer", choices=["llm", "keyword", "claude"], default="llm",
                     help="keyword = offline stub, needs no API key ('claude' is an "
@@ -253,14 +257,17 @@ def main(argv=None) -> int:
     sr.add_argument("--limit", type=int, help="cap jobs sent to the LLM (cost guard)")
     sr.set_defaults(func=cmd_run)
 
-    sa = sub.add_parser("applied", help="mark a job_id as applied")
+    sa = sub.add_parser("applied", help="mark a job_id as applied", parents=[base_p])
     sa.add_argument("job_id")
     sa.set_defaults(func=cmd_applied)
 
-    ss = sub.add_parser("stats", help="tracker summary + CSV export")
+    ss = sub.add_parser("stats", help="tracker summary + CSV export", parents=[base_p])
     ss.set_defaults(func=cmd_stats)
 
     args = p.parse_args(argv)
+    if not getattr(args, "config", None):
+        args.config = "config.yaml"
+
     return args.func(args)
 
 

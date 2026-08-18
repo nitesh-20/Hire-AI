@@ -13,6 +13,7 @@ from pathlib import Path
 
 import yaml
 
+from . import __version__
 from . import digest as digest_mod
 from . import llm, mailer
 from . import prefilter as prefilter_mod
@@ -240,6 +241,7 @@ def main(argv=None) -> int:
         description="HirePilot AI — Personal job intelligence agent. Finds and drafts; never submits.",
         parents=[base_p],
     )
+    p.add_argument("--version", "-v", action="version", version=f"%(prog)s {__version__}")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     sp = sub.add_parser("profile", help="turn a resume into profile.json", parents=[base_p])

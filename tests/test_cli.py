@@ -64,3 +64,21 @@ tracker_csv: "{tmp_path / 'tracker.csv'}"
 
     code = main(["--config", str(cfg_file), "stats"])
     assert code == 0
+
+
+def test_cli_version_flag(capsys):
+    """Test --version and -v CLI flags."""
+    from hirepilot import __version__
+
+    with pytest.raises(SystemExit) as exc_info:
+        main(["--version"])
+    assert exc_info.value.code == 0
+    captured = capsys.readouterr()
+    assert __version__ in captured.out or __version__ in captured.err
+
+    with pytest.raises(SystemExit) as exc_info:
+        main(["-v"])
+    assert exc_info.value.code == 0
+    captured = capsys.readouterr()
+    assert __version__ in captured.out or __version__ in captured.err
+
